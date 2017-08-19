@@ -1,0 +1,252 @@
+/*
+	Se va arreglando. En este punto, la idea es probar a poner el cociente en módulo 10. Esto es importante y algo en lo que no había caído en la teoría de los absurdos.
+*/
+
+
+
+void setup () {
+   size(400, 600);
+   textFont(createFont("Georgia", 36));
+}
+
+float num = 2;
+float den = 3;
+boolean div = false;
+boolean divMuestra = true;
+byte edit = 0;
+char letter;
+String numStr = "2";
+String denStr = "3";
+char[] chNum;
+char[] chDen;
+
+void draw() {
+  background(0);
+  fill(240);
+  stroke(160);
+  textSize(20);
+  text("División racional:", 20, 40);
+  
+  line(200, 70, 200, 105);
+  line(200, 105, 360, 105);
+  
+  textAlign(RIGHT);
+  text(numStr, 180, 90);
+  if (edit == 1) if (millis()%1000 > 500) line(182, 75, 182, 94);
+  textAlign(LEFT);
+  text(denStr, 220, 90);
+  if (edit == 2) if (millis()%1000 > 500) line(223+textWidth(denStr), 75, 223+textWidth(denStr), 94);
+  
+  if (330 <= mouseX && mouseX <= 360 && 25 <= mouseY && mouseY <= 55) {
+     fill(150, 0, 150, 70);
+     div = true;
+  } else {
+     fill(10);
+     div = false;
+  }
+  rect(330, 25, 30, 30);
+  if (divMuestra) Dividir(num, den);
+}
+
+void Dividir(float num, float den) {
+   int[] b = new int[int(den)];
+   int[] r = new int[int(den)];
+   int[] c = new int[int(den)];
+   boolean periodo = false;
+   boolean decimales = false;
+   fill(240);
+   c[0] = int(num)/int(den);
+   text(c[0], 220, 130);
+   b[0] = int(num)-int(den)*c[0];
+   if (b[0] < int(den)) {
+      decimales = true;
+      text("'", 230, 130);
+   }
+   if (decimales) {
+     r[0] = b[0] * 10;
+   } else {
+     r[0] = b[0]; 
+   }
+   textAlign(RIGHT);
+   text(r[0], 180, 120);
+   textAlign(LEFT);
+   //if (!unPaso) {
+     for (int n = 1; n < int(den); n++) {
+       if (!periodo) {
+         c[n] = int(r[n-1])/int(den);
+         /*
+         if (c[n] != 0) {
+           text(c[n], 220 + 15*n, 130);
+         } else {
+           boolean comaAnt = false;
+           for (int m = 0; m < n; m++) {
+             if (c[m] == 0) comaAnt = true;
+           }
+           if (comaAnt) {
+             text("0", 220 + 15*n, 130);
+           } else {
+             text("0'", 220 + 15*n, 130); 
+           }
+         }
+         */
+         text(c[n], 220 + 15*n, 130);
+         b[n] = r[n-1] - int(den)*c[n];
+         
+         
+         
+         for (int m = 0; m < n; m++) {
+           if (!periodo) {
+             if (b[n] == b[m]) {
+               line(221 +15*(m+1), 135, 221+15*n+8, 135);
+               periodo = true;
+             }
+           }
+         }
+         
+         if (!decimales) {
+           if (b[n] < int(den)) {
+             decimales = true;
+             text("'", 230+15*n, 130);
+           }
+         }
+         if (decimales) {
+           r[n] = b[n] * 10;
+         } else {
+           r[0] = b[0]; 
+         }
+         
+         textAlign(RIGHT);
+         if (!periodo) {
+           text(r[n], 180, 120 +30*n);
+         } else {
+           text(b[n], 180, 120 +30*n);
+         }
+         textAlign(LEFT);
+       }
+     }
+   //}
+}
+
+void mouseClicked() {
+  if (mouseButton == LEFT) {
+    if (div) {
+      edit = 0;
+      if (numStr.charAt(numStr.length()-1) == '\'') {
+        chNum = new char[numStr.length()-1];
+        for (int i = 0; i < numStr.length()-1; i++) chNum[i] = numStr.charAt(i);
+        numStr = new String(chNum);
+      }
+      if (denStr.charAt(denStr.length()-1) == '\'') {
+        chDen = new char[denStr.length()-1];
+        for (int i = 0; i < denStr.length()-1; i++) chDen[i] = denStr.charAt(i);
+        denStr = new String(chDen);
+      }
+      chDen = new char[denStr.length()-1];
+      for (int i = 0; i < denStr.length()-1; i++) if (denStr.charAt(i) == '\'') {
+        for (int j = 1; j < denStr.length() - j; j++) {
+          byte b = 0;
+          for (byte k = 0; k < denStr.length()-1; k++) if (denStr.charAt(k) == '\'') b = k;
+          for (byte k = 0; k < denStr.length()-1; k++) {
+            if (k < b) {
+              chDen[k] = denStr.charAt(k); 
+            } else {
+              chDen[k] = denStr.charAt(k+1); 
+            }
+          }
+          
+          
+          //num = num*10;
+        }
+        denStr = new String(chDen);
+      }
+      
+      
+      den = float(denStr);
+      num = float(numStr);
+      if (den == 0) den = 1;
+      divMuestra = true;
+    } else {
+      if (30 <= mouseX && mouseX <= 200 && 70 <= mouseY && mouseY <= 105) {
+        edit = 1;
+      } else if (200 <= mouseX && mouseX <= 370 && 70 <= mouseY && mouseY <= 105) {
+        edit = 2;
+      } else {
+        edit = 0; 
+      }
+    }
+  }
+}
+
+void keyPressed() {
+  if (edit == 1 || edit == 2) {
+    divMuestra = false;
+    if (48 <= key && key <= 57) {
+      if (edit == 1) {
+        numStr = numStr + key; 
+      } else {
+        denStr = denStr + key;
+      }
+    }
+    letter = '\'';
+    if (key == 44 || key == 46 ||key == 39) {
+      divMuestra = false;
+      if (edit == 1) {
+        byte c = 0;
+        for (int i = 0; i < numStr.length(); i++) if (numStr.charAt(i) == '\'' ) c++;
+        if (c == 0) numStr = numStr + letter;
+      } else {
+        byte c = 0;
+        for (int i = 0; i < denStr.length(); i++) if (denStr.charAt(i) == '\'' ) c++;
+        if (c == 0) denStr = denStr + letter;
+      }
+    }
+    if (key == BACKSPACE || key == 127) {
+      divMuestra = false;
+      if (edit == 1) {
+        if (numStr.length() > 0) {
+          chNum = new char[numStr.length()-1];
+          for (int i = 0; i < numStr.length()-1; i++) chNum[i] = numStr.charAt(i);
+          numStr = new String(chNum);
+        }
+      } else {
+        if (denStr.length() > 0) {
+          chDen = new char[denStr.length()-1];
+          for (int i = 0; i < denStr.length()-1; i++) chDen[i] = denStr.charAt(i);
+          denStr = new String(chDen);
+        }
+      }
+    }
+  }
+}
+
+
+/*
+float[] Simplificar(float num, float dem) {
+  float[] sal = {num, dem};
+  if (num == 0) return sal;
+  float top = 0;
+  if (abs(num) < abs(dem)) {
+    top = abs(dem);
+  } else {
+    top = abs(num);
+  }
+  float num_r = num;
+  float dem_r = dem;
+  for (int i = 2; i <= sqrt(top); i++) {
+    if (num_r % i == 0) {
+      if (dem_r % i == 0) {
+        num_r = num_r/i;
+        dem_r = dem_r/i;
+        i = 1;
+      }
+    }
+  }
+  if (num_r < 0 & dem_r < 0) {
+   num_r = abs(num_r);
+   dem_r = abs(dem_r); 
+  }
+  sal[0] = num_r;
+  sal[1] = dem_r;
+ return sal; 
+}
+*/
